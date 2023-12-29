@@ -9,26 +9,27 @@ User = get_user_model()
 admin.site.unregister(Group)
 
 class UserAdmin(BaseUserAdmin):
-    form = UserAdminChangeForm #change form in admin will be ours from useradminchangeform
-    add_form = UserAdminCreationForm #admin change form in admin will be ours from useradmincreationform
+    form = UserAdminChangeForm 
+    add_form = UserAdminCreationForm 
     
-    list_display = ['email', 'admin','staff','active']
+    list_display = ['email','username', 'admin','staff','active']
     list_filter = ['admin','staff','active']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('username','description')}),
+        ('Personal info', {'fields': ('username','custom_name','description',)}),
         ('Permissions', {'fields': ('active','staff','admin')}),
+        ('Following', {'fields': ('following',), 'classes': ('wide',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password', 'password_2',)}
+            'fields': ('email','username' ,'password', 'password_2',)}
         ),
     )
-    search_fields = ['email']
+    search_fields = ['email','username']
     ordering = ['email']
-    filter_horizontal = ()
+    filter_horizontal = ('following',)
     
     
 admin.site.register(User, UserAdmin)
