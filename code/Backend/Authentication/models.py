@@ -40,7 +40,9 @@ class User(AbstractBaseUser):
     custom_name = models.CharField(unique=True,null=True,default='')
     description = models.TextField(null = True,max_length=400,default="No description.")
     date_created = models.DateTimeField(auto_now_add=True,null = False)
-    following = models.ManyToManyField('self', symmetrical=False, related_name='followers')
+    following = models.ManyToManyField('self',  related_name='followers')
+    is_premium = models.BooleanField(default=False)
+    premium_expiration_date = models.DateField(null=True, blank=True)
 
     
     USERNAME_FIELD = 'email'

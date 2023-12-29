@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'Authentication.middleware.CustomAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'Backend.urls'
@@ -72,6 +73,23 @@ TEMPLATES = [
         },
     },
 ]
+
+
+REST_FRAMEWORK = {
+'DEFAULT_AUTHENTICATION_CLASSES': (
+        
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        
+    ),
+
+'DEFAULT_PERMISSION_CLASSES': (
+         'rest_framework.permissions.IsAuthenticated',
+    ),
+
+
+}
+
 
 WSGI_APPLICATION = 'Backend.wsgi.application'
 
@@ -142,3 +160,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTHENTICATION_BACKENDS = [
+    'Authentication.backends.EmailOrUsernameModelBackend', 
+    'django.contrib.auth.backends.ModelBackend',
+]
