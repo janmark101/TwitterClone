@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status, generics
 from django.contrib.auth import authenticate, logout
 from .serializers import UserSerializer
+from .emails import send_verify_email
 
 # Create your views here.
 class Login(APIView):
@@ -41,7 +42,31 @@ class Logout(APIView):
             pass
         return Response({'error':'Something went wrong!'},status=status.HTTP_400_BAD_REQUEST)  
     
-class Register(generics.CreateAPIView):
+    
+    
+class Register(APIView):
     authentication_classes = ()
     permission_classes = ()
-    serializer_class = UserSerializer  
+    
+    def post(self,request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            send_verify_email(serializer.data['email'])
+            return Response({'message': 'Succesfully registered. Verify your email!'},status=status.HTTP_200_OK)
+        return Response({'error': 'Registration failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
+
+class VerifyAccount(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def post(self,request):
+        user = request.user
+        print(user)
+        if request.data['verify_code'] == user.verify_code:
+            user.is_verified = True
+            user.verify_code = ''
+            user.save()
+            return Response({'message':'Your account has been activated!'},status=status.HTTP_400_BAD_REQUEST)  
+        return Response({'error':'Something went wrong! Try again.'},status=status.HTTP_400_BAD_REQUEST)  
+
