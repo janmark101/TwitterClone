@@ -43,7 +43,8 @@ class User(AbstractBaseUser):
     following = models.ManyToManyField('self',  related_name='followers')
     is_premium = models.BooleanField(default=False)
     premium_expiration_date = models.DateField(null=True, blank=True)
-
+    is_verified = models.BooleanField(default=False)
+    verify_code = models.CharField(max_length=6,null=True,blank=True,unique=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
