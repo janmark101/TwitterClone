@@ -12,7 +12,7 @@ from .emails import send_verify_email
 class Login(APIView):
     permission_classes=()
     
-    def get(self,request):
+    def post(self,request):
         username_or_email = request.data.get('username_or_email')
         password = request.data.get('password')
         
@@ -32,7 +32,6 @@ class Logout(APIView):
     authentication_classes=[TokenAuthentication]
     
     def post(self,request):
-        print(request.user.is_authenticated)
         try:
             token = Token.objects.get(user=request.user)
             token.delete()
@@ -53,7 +52,7 @@ class Register(APIView):
         if serializer.is_valid():
             serializer.save()
             send_verify_email(serializer.data['email'])
-            return Response({'message': 'Succesfully registered. Verify your email!'},status=status.HTTP_200_OK)
+            return Response({'message': 'Succesfully registered. Verify your email!'},status=status.HTTP_201_CREATED)
         return Response({'error': 'Registration failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
 class VerifyAccount(APIView):
@@ -62,11 +61,10 @@ class VerifyAccount(APIView):
     
     def post(self,request):
         user = request.user
-        print(user)
         if request.data['verify_code'] == user.verify_code:
             user.is_verified = True
             user.verify_code = ''
             user.save()
-            return Response({'message':'Your account has been activated!'},status=status.HTTP_400_BAD_REQUEST)  
+            return Response({'message':'Your account has been activated!'},status=status.HTTP_200_OK)  
         return Response({'error':'Something went wrong! Try again.'},status=status.HTTP_400_BAD_REQUEST)  
 
