@@ -1,3 +1,6 @@
-from django.shortcuts import render
+from .models import Comment,Tweet,Like
+from .serializers import TweetSerializer
+from rest_framework.views import APIViews
 
-# Create your views here.
+class TweetView(APIView):
+    
