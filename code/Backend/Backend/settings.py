@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'Authentication',
     'api',
+    'apiLikes',
+    'apiComments',
     'django.contrib.sites', 
     'allauth',
     'allauth.account',
