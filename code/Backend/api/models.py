@@ -15,7 +15,7 @@ class Tweet(models.Model):
         return f"{self.user}'s tweet : {self.id}"
     
 class Like(models.Model):
-    tweet = models.ForeignKey(Tweet, related_name='liked_tweet', on_delete=models.CASCADE)
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='user_liker', on_delete=models.CASCADE)
     
     def __str__(self):
@@ -31,4 +31,4 @@ class Comment(models.Model):
         ordering = ['-date']
     
     def __str__(self):
-        return f"comment to : {self.tweet}"
+        return f"comment to : {self.tweet} from {self.user}"

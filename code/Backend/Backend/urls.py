@@ -22,4 +22,5 @@ urlpatterns = [
     path('auth/',include('Authentication.urls')),
     path('accounts/', include('allauth.urls')),
     path('authgoogle/', include('allauth.socialaccount.urls')),
+    path('api/',include('api.urls'))
 ]
