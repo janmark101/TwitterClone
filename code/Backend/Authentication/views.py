@@ -5,8 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate, logout
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserLessInfoSerializer
 from .emails import send_verify_email
+from .models import User
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 class Login(APIView):
@@ -67,4 +69,78 @@ class VerifyAccount(APIView):
             user.save()
             return Response({'message':'Your account has been activated!'},status=status.HTTP_200_OK)  
         return Response({'error':'Something went wrong! Try again.'},status=status.HTTP_400_BAD_REQUEST)  
+    
+ #return list of all users
+class UsersListView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def get(self,request):
+        users = User.objects.all()
+        serializer = UserSerializer(users,many=True)
+        return Response(serializer.data)
 
+#return one user 
+class UserObjectView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def get(self,request,pk):
+        users = get_object_or_404(User,pk=pk)
+        serializer = UserSerializer(users,many=False)
+        return Response(serializer.data)
+    
+ # return list of following and followers for user
+class FollowersFollowingForUser(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def get(sself,request):
+        user = request.user
+        following = user.following.all()
+        followers = user.followers.prefetch_related('following')
+        following_serializer = UserLessInfoSerializer(following,many=True).data
+        followers_serializer = UserLessInfoSerializer(followers,many=True).data
+        followers_following = [{
+            'following' : following_serializer,
+            'following_count' : len(following_serializer),
+            'followers' : followers_serializer,
+            'followers_count' : len(followers_serializer)
+            }]
+        return Response(followers_following,status=status.HTTP_200_OK)
+    
+#api to change users custom name
+class ChangeCustomNameView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def post(self,request):
+        custom_name = request.data['custom_name']
+        if len(custom_name) <= 4 or custom_name.isdigit():
+            return Response({'error': 'Nickname must contain at least 5 characters and cannot consist of only numbers!'},status=status.HTTP_400_BAD_REQUEST)
+        elif User.objects.filter(custom_name=custom_name).exists():
+            return Response({'error': 'Nickname is already taken. Choose a different one.'},status=status.HTTP_400_BAD_REQUEST)
+        else :
+            user = request.user
+            user.custom_name = custom_name
+            user.save()
+            return Response({'message': 'Changed succesfully!'},status=status.HTTP_200_OK)
+    
+   #api to follow users
+class FollowUserView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def post(self,request,pk):
+        user_to_follow = get_object_or_404(User,pk=pk)
+        user = request.user
+        
+        if user == user_to_follow:
+            return Response({'error' : 'You can not follow yourself!'},status=status.HTTP_400_BAD_REQUEST)
+        
+        elif user_to_follow in user.following.all():
+            user.following.remove(user_to_follow)
+            return Response({'message' : 'Unfolowed user.'},status=status.HTTP_200_OK)
+        
+        user.following.add(user_to_follow)
+        return Response({'message' : 'User followed.'},status=status.HTTP_200_OK)

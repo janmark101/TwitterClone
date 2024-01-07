@@ -70,7 +70,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'Authentication.middleware.GmailAuthMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -98,11 +97,12 @@ REST_FRAMEWORK = {
         
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        
+
     ),
 
 'DEFAULT_PERMISSION_CLASSES': (
-         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
+        'api.permissions.IsObjectOwner'
     ),
 
 

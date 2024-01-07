@@ -9,8 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
     password_confirm = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     class Meta:
         model = User
-        fields = ('id','username','email','password','password_confirm')
+        fields = ('id','username','email','password','password_confirm','custom_name','is_premium','is_verified')
         extra_kwargs = {'password': {'write_only': True}}
+        read_only_fields = ['custom_name','is_premium','is_verified']
         
     def validate_username(self,value):
         if len(value) < 5 :
@@ -33,3 +34,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+    
+class UserLessInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','username','custom_name')
