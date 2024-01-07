@@ -8,6 +8,7 @@ from rest_framework import status
 from Authentication.models import User
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from .permissions import IsObjectOwner
 
 #all tweets and creating tweet
 class OnlyTweetView(APIView):
@@ -108,7 +109,8 @@ class AllTweetsLikedCommentedFromFollowed(APIView):
         commented_tweets = Tweet.objects.filter(
             Q(comment__user__in=user_followed_list)  
         )
-        tweets = (commented_tweets | created_tweets).distinct()
+        retweeted = Tweet.objects.filter(retweets__in=user_followed_list)
+        tweets = (commented_tweets | created_tweets | retweeted).distinct()
         tweet_data = []
         for tweet in tweets:
             tweet_serializer = TweetSerializer(tweet).data
@@ -125,3 +127,62 @@ class AllTweetsLikedCommentedFromFollowed(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
     
+  
+class UserRetweetedTweetsView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def get(self,request):
+        tweets = Tweet.objects.filter(retweets=request.user)
+        tweet_data = []
+        for tweet in tweets:
+            tweet_serializer = TweetSerializer(tweet).data
+            like_serializer = LikeSerializer(Like.objects.filter(tweet=tweet), many=True).data
+            comment_serializer = CommentSerializer(Comment.objects.filter(tweet=tweet), many=True).data
+
+            tweet_data.append({
+                'tweet': tweet_serializer,
+                'likes': like_serializer,
+                'comments': comment_serializer,
+                'likes_count' : len(like_serializer),
+                'comments_count' : len(comment_serializer)
+            })
+
+        return Response(tweet_data, status=status.HTTP_200_OK)
+    
+
+class TweetObjectView(APIView):
+    permission_classes=[IsAuthenticated,IsObjectOwner]
+    authentication_classes=[TokenAuthentication]
+    
+    def get(self,request,pk):
+        tweet = get_object_or_404(Tweet,pk=pk)
+        likes = Like.objects.filter(tweet=tweet)
+        comments = Comment.objects.filter(tweet=tweet)
+        tweet_serializer = TweetSerializer(tweet,many=False).data
+        likes_serializer = LikeSerializer(likes,many=True).data
+        comments_serializer = CommentSerializer(comments,many=True).data
+        data = [{
+            'tweet' : tweet_serializer,
+            'likes' : likes_serializer,
+            'comments' : comments_serializer,
+            'likes_count' : len(likes_serializer),
+            'comments_count' : len(comments_serializer)
+        }]
+        return Response(data,status=status.HTTP_200_OK)
+    
+    def delete(self,request,pk):
+        tweet = get_object_or_404(Tweet,pk=pk)
+        self.check_object_permissions(request, tweet)
+        tweet.delete()
+        return Response({'message': 'Succesfully deleted.'},status=status.HTTP_200_OK)
+    
+    
+class RetweetsView(APIView):
+    permission_classes=[IsAuthenticated,IsObjectOwner]
+    authentication_classes=[TokenAuthentication]
+    
+    def post(self,request,pk):
+        tweet = get_object_or_404(Tweet,pk=pk)
+        tweet.retweets.add(request.user)
+        return Response({'message' : 'Tweet retweeted.'},status=status.HTTP_200_OK)

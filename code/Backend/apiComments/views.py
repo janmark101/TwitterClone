@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from api.models import Comment,Tweet,Like
 from api.serializers import TweetSerializer, LikeSerializer,CommentSerializer
 from rest_framework.views import APIView
@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
+from api.permissions import IsObjectOwner
 # Create your views here.
 
 #all comments and creating a comment
@@ -74,3 +75,13 @@ class ComentedTweetsFromFollowedView(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
     
+    
+class DeleteCommentView(APIView):
+    permission_classes=[IsAuthenticated,IsObjectOwner]
+    authentication_classes=[TokenAuthentication]
+    
+    def delete(self,request,pk):
+        comment = get_object_or_404(Comment,pk=pk)
+        self.check_object_permissions(request,comment)
+        comment.delete()
+        return Response({'message': 'Succesfully deleted.'},status=status.HTTP_200_OK)
