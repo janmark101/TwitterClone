@@ -1,5 +1,5 @@
 
-### Twitter Clone
+# Twitter Clone
 
 The Twitter Clone is a project aimed at creating a simplified version of the Twitter social media platform. 
 This project specifically involves creating a robust API for the following features.
@@ -79,7 +79,7 @@ Navigate to `http://localhost:8000/`.
 
 ## API Endpoints 
 
-1. **Authentication:**
+1. Authentication:
 -'POST /auth/login/' - Log in the user
 -'POST /auth/logout/' - Log out the user
 -'POST /auth/register/' - Register a new user
@@ -91,7 +91,7 @@ Navigate to `http://localhost:8000/`.
 -'POST /auth/followuser/{id}/' - Follow or unfollow user by user.id
 -'POST /auth/changepassword/' - Change password 
 
-2. **api:**
+2. api:
 -'GET /api/fullapi/' - Retrieve the list of all tweets with linked likes and comments
 -'POST /api/retweet/{id}/' - Retweet tweet by logged-in user
 -'GET /api/tweets/' - Retrieve the list of all tweets
@@ -103,14 +103,14 @@ Navigate to `http://localhost:8000/`.
 -'GET /api/userstweets/' - Retrieve the list of tweets created by logged-in user
 -'GET /api/userretweetedtweets/' - Retrieve the list of tweets retweeted by logged-in user
 
-3. **apiComments:**
+3. apiComments:
 -'GET /api/comments/allcomments/' - Retrieve the list of all comments
 -'POST /api/comments/allcomments/' - Creating a comment
 -'GET /api/comments/commentedtweetsfromfollowed/' - Retrieve the list of tweets commented by followed users
 -'DELETE /api/comments/delete/{id}/' - Delete comment by comment.id
 -'GET /api/comments/usercommentedtweets/' - Retrieve the list of tweets commented by logged-in user
 
-4. **apiLikes:**
+4. apiLikes:
 -'GET /api/likes/alllikes/' - Retrieve the list of all likes
 -'GET /api/likes/likedtweetsfroomfollowed/' - Retrieve the list of tweets liked by followed users
 -'POST /api/likes/liketweet/' - Like or unlike tweet
