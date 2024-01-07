@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from api.models import Comment,Tweet,Like
 from api.serializers import TweetSerializer, LikeSerializer,CommentSerializer
 from rest_framework.views import APIView
@@ -22,7 +21,7 @@ class OnlyLikesView(APIView):
     
     
  # liked tweets
-class LikedTweetsForUserView(APIView):
+class UserLikedTweetsView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
     
@@ -57,7 +56,7 @@ class LikeTweetView(APIView):
             like,created = Like.objects.get_or_create(tweet=tweet,user=request.user)
             if not created:
                 like.delete()
-                return Response({'message' : 'Unliked tweet succesfully!'},status=status.HTTP_201_CREATED)
+                return Response({'message' : 'Unliked tweet succesfully!'},status=status.HTTP_200_OK)
             else:
                 return Response({'message' : 'Liked tweet succesfully!'},status=status.HTTP_201_CREATED)
         return Response({'error' : 'Something went wrong!'},status=status.HTTP_400_BAD_REQUEST)

@@ -5,7 +5,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from Authentication.models import User
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .permissions import IsObjectOwner
@@ -76,7 +75,7 @@ class UsersTweetsView(APIView):
      
  
 #tweets from followed users
-class TweetsFroUserFromFollowedView(APIView):
+class TweetsFromFollowedView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
     
@@ -99,6 +98,7 @@ class TweetsFroUserFromFollowedView(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
 
+# all tweets linked to people which logged user follows
 class AllTweetsLikedCommentedFromFollowed(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
@@ -127,7 +127,7 @@ class AllTweetsLikedCommentedFromFollowed(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
     
-  
+#list oof tweets which user retweeted
 class UserRetweetedTweetsView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
@@ -150,7 +150,7 @@ class UserRetweetedTweetsView(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
     
-
+# single tweet object and creating tweet
 class TweetObjectView(APIView):
     permission_classes=[IsAuthenticated,IsObjectOwner]
     authentication_classes=[TokenAuthentication]
@@ -177,8 +177,8 @@ class TweetObjectView(APIView):
         tweet.delete()
         return Response({'message': 'Succesfully deleted.'},status=status.HTTP_200_OK)
     
-    
-class RetweetsView(APIView):
+#view to retweet tweets
+class RetweetView(APIView):
     permission_classes=[IsAuthenticated,IsObjectOwner]
     authentication_classes=[TokenAuthentication]
     
