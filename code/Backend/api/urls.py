@@ -11,6 +11,6 @@ urlpatterns = [
     path('tweetsfromfollowed/',TweetsFromFollowedView.as_view(),name='tweetsfromfollowed'),
     path('tweetslinkedwithfollowed/',AllTweetsLikedCommentedFromFollowed.as_view()),
     path('userretweetedtweets/',UserRetweetedTweetsView.as_view()),
-    path('tweet/<int:pk>/',TweetObjectView.as_view()),
+    path('tweets/<int:pk>/',TweetObjectView.as_view()),
     path('retweet/<int:pk>/',RetweetView.as_view())
 ]

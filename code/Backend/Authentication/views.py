@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate, logout
-from .serializers import UserSerializer, UserLessInfoSerializer
+from .serializers import UserSerializer, UserLessInfoSerializer, ChangePasswordSerializer
 from .emails import send_verify_email
 from .models import User
 from django.shortcuts import get_object_or_404
@@ -125,6 +125,24 @@ class ChangeCustomNameView(APIView):
             user.custom_name = custom_name
             user.save()
             return Response({'message': 'Changed succesfully!'},status=status.HTTP_200_OK)
+        
+
+class ChangePasswordView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[TokenAuthentication]
+    
+    def post(sself,request):
+        user = request.user
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(serializer.data['old_password']):
+                return Response({'error' : 'Old password dont match'},status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.data['new_password'])
+            user.save()
+            return Response({'message': 'Password changed succesfully!'},status=status.HTTP_200_OK)
+        return Response({'error' : serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+
+    
     
    #api to follow users
 class FollowUserView(APIView):
