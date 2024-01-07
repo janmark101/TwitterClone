@@ -165,6 +165,27 @@ class ChangeCustomNameTest(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         self.assertNotEqual('test2',self.user.custom_name)
         
+
+class ChangePasswordTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='test',password='test123123',email='test@gmail.com')
+        token = Token.objects.create(user=self.user)
+        self.client = self.client_class(HTTP_AUTHORIZATION=f'Token {token.key}')
+        
+    def test_change_password(self):
+        data = {'old_password': 'test123123','new_password':'test12345','confirm_password' : 'test12345'}
+        response = self.client.post('/auth/changepassword/',data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_change_password_invalid_old(self):
+        data = {'old_password': '12345','new_password':'test1234','confirm_password' : 'test12345'}
+        response = self.client.post('/auth/changepassword/',data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+    
+    def test_change_password_invalid_confirm(self):
+        data = {'old_password': 'test123123','new_password':'test1234','confirm_password' : 'test123'}
+        response = self.client.post('/auth/changepassword/',data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         
 class FollowUserTest(APITestCase):
     def setUp(self):

@@ -39,3 +39,22 @@ class UserLessInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id','username','custom_name')
+        
+        
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+    
+    class Meta:
+        model = User
+        fields = ('old_password', 'new_password', 'confirm_password')
+    
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
+    
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError({'error': 'Passwords must match!'})
+        return data
