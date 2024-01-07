@@ -21,7 +21,7 @@ class Login(APIView):
         if username_or_email is None or password is None: 
             return Response({'error' : 'You must insert username or email and password!'},status=status.HTTP_400_BAD_REQUEST) 
         
-        user = authenticate(username=username_or_email,password=password) # jest to logowanie za pomoca email albo ussername 
+        user = authenticate(username=username_or_email,password=password) 
         
         if not user:
             return Response({'error':'Invalid credentials!'},status=status.HTTP_400_BAD_REQUEST)

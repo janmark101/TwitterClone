@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from api.models import Comment,Tweet,Like
 from api.serializers import TweetSerializer, LikeSerializer,CommentSerializer
 from rest_framework.views import APIView
@@ -11,7 +11,7 @@ from api.permissions import IsObjectOwner
 # Create your views here.
 
 #all comments and creating a comment
-class OnlyCommentView(APIView):
+class OnlyCommentsView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
     
@@ -28,8 +28,8 @@ class OnlyCommentView(APIView):
             return Response({'message' : 'Comment created succesfully!'},status=status.HTTP_201_CREATED)
         return Response({'error' : 'Something went wrong!'},status=status.HTTP_400_BAD_REQUEST)
     
-#commented tweets
-class CommentedTweetsFroUserView(APIView):
+#all commented tweets by user
+class UserCommentedTweetsView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
     
@@ -51,7 +51,7 @@ class CommentedTweetsFroUserView(APIView):
 
         return Response(tweet_data, status=status.HTTP_200_OK)
     
-    
+# all tweets commented by userss which logged user follow
 class ComentedTweetsFromFollowedView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
