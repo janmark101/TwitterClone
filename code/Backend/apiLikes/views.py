@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
-# Create your views here.
+from api.views import get_tweets_data
 
 
 #all likes 
@@ -27,20 +27,7 @@ class UserLikedTweetsView(APIView):
     
     def get(self,request):
         tweets = Tweet.objects.filter(like__user=request.user)
-        tweet_data = []
-        for tweet in tweets:
-            tweet_serializer = TweetSerializer(tweet).data
-            like_serializer = LikeSerializer(Like.objects.filter(tweet=tweet), many=True).data
-            comment_serializer = CommentSerializer(Comment.objects.filter(tweet=tweet), many=True).data
-
-            tweet_data.append({
-                'tweet': tweet_serializer,
-                'likes': like_serializer,
-                'comments': comment_serializer,
-                'likes_count' : len(like_serializer),
-                'comments_count' : len(comment_serializer)
-            })
-
+        tweet_data = get_tweets_data(tweets)
         return Response(tweet_data, status=status.HTTP_200_OK)
     
  # function to like or unlike tweets   
@@ -69,17 +56,5 @@ class LikedTweetsFromFollowedView(APIView):
     def get(self,request):
         user_following_list = request.user.following.all()
         tweets = Tweet.objects.filter(Q(like__user__in=user_following_list))
-        tweet_data = []
-        for tweet in tweets:
-            tweet_serializer = TweetSerializer(tweet).data
-            like_serializer = LikeSerializer(Like.objects.filter(tweet=tweet), many=True).data
-            comment_serializer = CommentSerializer(Comment.objects.filter(tweet=tweet), many=True).data
-            tweet_data.append({
-                'tweet': tweet_serializer,
-                'likes': like_serializer,
-                'comments': comment_serializer,
-                'likes_count' : len(like_serializer),
-                'comments_count' : len(comment_serializer)
-            })
-
+        tweet_data = get_tweets_data(tweets)
         return Response(tweet_data, status=status.HTTP_200_OK)
