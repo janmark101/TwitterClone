@@ -8,7 +8,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from api.permissions import IsObjectOwner
+from api.views import get_tweets_data
 # Create your views here.
+
+
+
 
 #all comments and creating a comment
 class OnlyCommentsView(APIView):
@@ -35,20 +39,7 @@ class UserCommentedTweetsView(APIView):
     
     def get(self,request):
         tweets = Tweet.objects.filter(comment__user=request.user)  
-        tweet_data = []
-        for tweet in tweets:
-            tweet_serializer = TweetSerializer(tweet).data
-            like_serializer = LikeSerializer(Like.objects.filter(tweet=tweet), many=True).data
-            comment_serializer = CommentSerializer(Comment.objects.filter(tweet=tweet), many=True).data
-
-            tweet_data.append({
-                'tweet': tweet_serializer,
-                'likes': like_serializer,
-                'comments': comment_serializer,
-                'likes_count' : len(like_serializer),
-                'comments_count' : len(comment_serializer)
-            })
-
+        tweet_data = get_tweets_data(tweets)
         return Response(tweet_data, status=status.HTTP_200_OK)
     
 # all tweets commented by userss which logged user follow
@@ -59,20 +50,7 @@ class ComentedTweetsFromFollowedView(APIView):
     def get(self,request):
         user_followed_list = request.user.following.all()
         tweets = Tweet.objects.filter(Q(comment__user__in=user_followed_list)) 
-        tweet_data = []
-        for tweet in tweets:
-            tweet_serializer = TweetSerializer(tweet).data
-            like_serializer = LikeSerializer(Like.objects.filter(tweet=tweet), many=True).data
-            comment_serializer = CommentSerializer(Comment.objects.filter(tweet=tweet), many=True).data
-
-            tweet_data.append({
-                'tweet': tweet_serializer,
-                'likes': like_serializer,
-                'comments': comment_serializer,
-                'likes_count' : len(like_serializer),
-                'comments_count' : len(comment_serializer)
-            })
-
+        tweet_data = get_tweets_data(tweets)
         return Response(tweet_data, status=status.HTTP_200_OK)
     
     

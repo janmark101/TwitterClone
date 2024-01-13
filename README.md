@@ -115,3 +115,4 @@ Navigate to `http://localhost:8000/`.
 - 'GET /api/likes/likedtweetsfroomfollowed/'  Retrieve the list of tweets liked by followed users
 - 'POST /api/likes/liketweet/'  Like or unlike tweet
 - 'GET /api/likes/userlikedtweets/'  Retrieve the list of tweets liked by logged-in user
+

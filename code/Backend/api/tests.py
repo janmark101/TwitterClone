@@ -88,21 +88,21 @@ class TweetObjectView(APITestCase):
         self.tweet = Tweet.objects.create(content='test',user=self.user)
         
     def test_get_tweet(self):
-        response = self.client.get(f'/api/tweet/{self.tweet.id}/',format='json')
+        response = self.client.get(f'/api/tweets/{self.tweet.id}/',format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         
     def test_delete_tweet(self):
-        response = self.client.delete(f'/api/tweet/{self.tweet.id}/',format='json')
+        response = self.client.delete(f'/api/tweets/{self.tweet.id}/',format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         
     def test_delete_not_existing_tweet(self):
-        response = self.client.delete('/api/tweet/404/',format='json')
+        response = self.client.delete('/api/tweets/404/',format='json')
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
         
     def test_delete_not_your_tweet(self):
         user_temp = User.objects.create_user(username='test_temp',password='123',email='testtemp@gmail.com')
         tweet_temp = Tweet.objects.create(content='test',user=user_temp)
-        response = self.client.delete(f'/api/tweet/{tweet_temp.id}/',format='json')
+        response = self.client.delete(f'/api/tweets/{tweet_temp.id}/',format='json')
         self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
         
 class RetweetView(APITestCase):
@@ -155,11 +155,11 @@ class TestNoPermissionURLS(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
         
     def test_get_tweet_idtweet_url(self):
-        response = self.client.get('/api/tweet/1/',format='json')
+        response = self.client.get('/api/tweets/1/',format='json')
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
         
     def test_delete_tweet_idtweet_url(self):
-        response = self.client.delete('/api/tweet/1/',format='json')
+        response = self.client.delete('/api/tweets/1/',format='json')
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
         
     def test_post_retweet_idtweet_url(self):
